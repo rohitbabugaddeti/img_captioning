@@ -3,7 +3,7 @@ import os
 import requests
 
 app = Flask(__name__)
-UPLOAD_FOLDER ="uploaded image"
+UPLOAD_FOLDER ="static/uploaded image"
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -18,6 +18,7 @@ def index():
 
 @app.route('/result', methods=['POST'])
 def result():
+    caption = ""
     if request.method == "POST":
         file = request.files['fileupload']
         file_name = file.filename
@@ -39,7 +40,8 @@ def result():
                     resp = requests.get(url)
                     file_type = resp.headers["Content-Type"]
                     if resp.status_code == 200 and "image" in resp.headers["Content-Type"].lower():
-                        with open(os.path.join(app.config['UPLOAD_FOLDER'], "uploaded_img."+ file_type[file_type.rfind("/")+1:]), 'wb') as imf:
+                        file_name_to_save = os.path.join(app.config['UPLOAD_FOLDER'], "uploaded_img."+ file_type[file_type.rfind("/")+1:])
+                        with open(file_name_to_save, 'wb') as imf:
                             imf.write(resp.content)
                     else:
                         return render_template("error.html",
@@ -57,7 +59,8 @@ def result():
                                            accepted_content = "image URL is")
             else:
                 if allowed_file(file_name):
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'uploaded_img' + file_name[file_name.rfind("."):]))
+                    file_name_to_save = os.path.join(app.config['UPLOAD_FOLDER'], 'uploaded_img' + file_name[file_name.rfind("."):])
+                    file.save(file_name_to_save)
                 else:
                     return render_template('error.html',
                                            action = "uploaded",
@@ -66,11 +69,15 @@ def result():
                                            to_do = "upload",
                                            accepted_content = "JPG/JPEG, PNG files are")
 
-    return url
+        from predict import get_caption
+        caption = get_caption(file_name_to_save)
+
+
+    return render_template("result.html", caption= caption, img_path = file_name_to_save)
 
 @app.route("/error")
 def error():
-    return render_template('error.html')
+    return render_template('result.html')
 
 if __name__ == "__main__":
     app.secret_key = "img_bot"
