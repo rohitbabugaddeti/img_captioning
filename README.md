@@ -8,4 +8,4 @@ Keras 2.3.1\
 numpy 1.18.1\
 Pillow 7.0.0\
 requests 2.23.0\
-tensorflow 1.13.2\
+tensorflow 1.13.2
