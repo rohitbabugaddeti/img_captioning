@@ -79,4 +79,4 @@ def result():
 
 if __name__ == "__main__":
     app.secret_key = "img_bot"
-    app.run(debug=True)
+    app.run()
