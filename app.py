@@ -23,7 +23,7 @@ def result():
         file = request.files['fileupload']
         file_name = file.filename
         url = request.form['url']
-        # print(file_name == '' and url == '')
+        
         if file_name and url:
             return render_template('error.html',
                                    action = "given",
@@ -75,9 +75,7 @@ def result():
 
     return render_template("result.html", caption= caption, img_path = file_name_to_save)
 
-@app.route("/error")
-def error():
-    return render_template('result.html')
+
 
 if __name__ == "__main__":
     app.secret_key = "img_bot"
